@@ -80,7 +80,23 @@ export type Auth =
 	| DatabaseAuth
 	| ScopeAuth;
 
-export default class Surreal extends Emitter {
+export default class Surreal extends Emitter<
+	& {
+		open: [];
+		opened: [];
+		close: [];
+		closed: [];
+		notify: [any];
+	}
+	& {
+		[
+			K in Exclude<
+				string,
+				"open" | "opened" | "close" | "closed" | "notify"
+			>
+		]: [any];
+	}
+> {
 	// ------------------------------
 	// Main singleton
 	// ------------------------------
@@ -215,7 +231,7 @@ export default class Surreal extends Emitter {
 		// we process it. If it has an ID
 		// then it is a query response.
 
-		this.#ws.on("message", (e: { data: string }) => {
+		this.#ws.on("message", (e) => {
 			const d = JSON.parse(e.data);
 
 			if (d.method !== "notify") {
